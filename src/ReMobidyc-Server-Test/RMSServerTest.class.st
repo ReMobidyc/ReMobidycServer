@@ -81,5 +81,5 @@ RMSServerTest >> testGetSpecificSimulationById [
 
 { #category : #accessing }
 RMSServerTest >> url [
-	^ 'http://localhost:', self port asString ,'/api/v0/'. 
+	^ 'http://localhost:', self port asString ,'/api/'. 
 ]

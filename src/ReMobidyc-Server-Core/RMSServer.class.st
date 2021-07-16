@@ -98,11 +98,11 @@ RMSServer >> registerRoutes [
 
 	teapot
 		GET: '/' -> '<h1> reMobidycServer API V0.0.1</h1>';output: #html;
-		POST: '/api/v0/register' -> (Send message: #registerSimulation: to: self);
-		GET: '/api/v0/runs/' -> (Send message: #getSimulations: to: self);
-		GET: '/api/v0/runs/<id:IsInteger>' -> (Send message: #getSpecificSimulationById: to: self); 
-		PUT: '/api/v0/runs/<id:IsInteger>' -> (Send message: #refreshSimulationState: to:self); 
-		DELETE: '/api/v0/runs/<id:IsInteger>' -> (Send message:#removeSimulation: to: self). 
+		POST: '/api/register' -> (Send message: #registerSimulation: to: self);
+		GET: '/api/runs/' -> (Send message: #getSimulations: to: self);
+		GET: '/api/runs/<id:IsInteger>' -> (Send message: #getSpecificSimulationById: to: self); 
+		PUT: '/api/runs/<id:IsInteger>' -> (Send message: #refreshSimulationState: to:self); 
+		DELETE: '/api/runs/<id:IsInteger>' -> (Send message:#removeSimulation: to: self). 
 ]
 
 { #category : #'as yet unclassified' }
