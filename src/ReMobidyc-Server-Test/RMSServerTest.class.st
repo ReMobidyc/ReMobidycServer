@@ -105,6 +105,80 @@ RMSServerTest >> testGetSpecificSimulationById [
 
 ]
 
+{ #category : #tests }
+RMSServerTest >> testRemoveSimulation [
+
+	| simulationId1 simulation1Data simulation1JSON |
+	simulation1Data := ZnEntity json: (NeoJSONWriter toString: { 
+				                    ('username' -> (simulation1 at: 'username')).
+				                    ('model' -> (simulation1 at: 'model')).
+				                    ('progress' -> (simulation1 at: 'progress')) }
+				                    asDictionary).
+
+	ZnClient new
+		url: 'http://localhost:10000/api/register';
+		entity: simulation1Data;
+		post.
+
+
+	" delete command"
+	ZnClient new
+		url: 'http://localhost:10000/api/runs/1';
+		delete. 
+		
+	" Get the simulation informations from our API"
+	simulationId1 := NeoJSONReader fromString: (ZnClient new
+			                  url: self url , 'runs/1';
+			                  get).
+	" Comparaisons simulation not found "
+	self
+		assert: (simulationId1 at:'code') equals:'NOT_FOUND'. 
+	self assert: (simulationId1 at:'message') equals:'No such simulation; 1'. 
+		
+]
+
+{ #category : #tests }
+RMSServerTest >> testUpdateSimulation [
+
+	| simulationId1 simulation1Data simulation1JSON simulationId1DataUpdate |
+	simulation1Data := ZnEntity json: (NeoJSONWriter toString: { 
+				                    ('username' -> (simulation1 at: 'username')).
+				                    ('model' -> (simulation1 at: 'model')).
+				                    ('progress' -> (simulation1 at: 'progress')) }
+				                    asDictionary).
+	simulation1JSON := NeoJSONReader fromString: simulation1Data.
+
+	ZnClient new
+		url: 'http://localhost:10000/api/register';
+		entity: simulation1Data;
+		post.
+
+	" Use update command "
+	simulationId1DataUpdate := ZnEntity json:
+		                           (NeoJSONWriter toString: { 
+				                            ('username'
+				                             -> (simulation1 at: 'username')).
+				                            ('model' -> (simulation1 at: 'model')).
+				                            ('progress' -> 1.0) } asDictionary).
+	" Update progress"
+	ZnClient new
+		url: 'http://localhost:10000/api/runs/1';
+		entity: simulationId1DataUpdate;
+		put.
+	" Get the simulation informations from our API"
+	simulationId1 := NeoJSONReader fromString: (ZnClient new
+			                  url: self url , 'runs/1';
+			                  get).
+	" Comparaisons "
+	self
+		assert: (simulationId1 at: 'username')
+		equals: (simulation1JSON at: 'username').
+	self
+		assert: (simulationId1 at: 'model')
+		equals: (simulation1JSON at: 'model').
+	self assert: (simulationId1 at: 'progress') equals: 1.0
+]
+
 { #category : #accessing }
 RMSServerTest >> url [
 	^ 'http://localhost:', self port asString ,'/api/'. 
