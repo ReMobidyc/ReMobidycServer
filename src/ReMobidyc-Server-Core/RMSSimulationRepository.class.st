@@ -8,6 +8,12 @@ Class {
 	#category : #'ReMobidyc-Server-Core-ReMobidyc-Server-Core'
 }
 
+{ #category : #'as yet unclassified' }
+RMSSimulationRepository class >> id: anId username: aUsername model: aModel progress: aProgress [
+	
+	^ self new id: anId; username: aUsername; model: aModel ; progress: aProgress. 
+]
+
 { #category : #adding }
 RMSSimulationRepository >> addSimulation: aDictionary [
 
