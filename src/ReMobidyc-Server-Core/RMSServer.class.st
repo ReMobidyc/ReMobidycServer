@@ -1,31 +1,53 @@
 "
-I represent reMobidycServer REST API. 
+Class: RMSServer
+                                                                                                    
 
-I have two endpoints: 
-	- /register/
-	- /runs/
+I represent reMobidycServer REST API.
+
+I have two endpoints:
+- /register/
+- /runs/
 
 
-For the Responsibility part: Three sentences about my main responsibilities - what I do, what I know.
+Public API commands:
+- register: Allow user to register a simulation. Path : /api/register
+- listing: Return the list of all simulations. Path : /api/runs
+- read: Return information on a specific run designed by the runID argument. Path:/api/runs/<id:isInteger>
+- update: Refresh state of a running simulation. Path : /api/runs/<id:isInteger>
+- delete: Delete a specific simulation. Path: /api/runs/<id:isInteger>
 
-For the Collaborators Part: State my main collaborators and one line about how I interact with them. 
+For more information concerning API description please see our github wiki page : [here](https://github.com/ReMobidyc/ReMobidycServer/wiki/API-design#register-endpoint).
 
-Public API and Key Messages
+Create an Instance of RMSServer :
+Use serveOn class message. 
+```language=Pharo&caption=Beautiful&label=Fig1
+   |server|
+	server := RMSServer serveOn: 2222
+```
 
-- message one   
-- message two 
-- (for bonus points) how to create instances.
-
-   One simple example is simply gorgeous.
- 
 Internal Representation and Key Implementation Points.
 
-    Instance Variables
-	simulations:		<Object>
-	teapot:		<Object>
+Instance Variables: 
+simulations:  <Object> which is a RMSSimulationRepository object contains all registered simulations.
+teapot:  <Object> Our API use teapot framework to deploy a REST API. 
+
+Example: Add simulation using ZnClient  
+```language=Pharo&caption=Beautiful&label=Fig1
+   |server addedSimulation |
+	server := RMSServer serveOn: 2222.
+	addedSimulation := (ZnEntity json: (NeoJSONWriter toString: { 
+								  ('username' -> 'korede').
+								  ('model' -> 'test').
+								  ('progress' -> 0.1) } asDictionary)).
+	ZnClient new
+		url: 'http://localhost:2222/api/register';
+		entity: addedSimulation;
+		post. 
+```
 
 
-    Implementation Points
+
+
 "
 Class {
 	#name : #RMSServer,
