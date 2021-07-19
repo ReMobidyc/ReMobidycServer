@@ -140,7 +140,7 @@ RMSServerTest >> testRemoveSimulation [
 { #category : #tests }
 RMSServerTest >> testUpdateSimulation [
 
-	| simulationId1 simulation1Data simulation1JSON simulationId1DataUpdate |
+	| simulationId1 simulation1Data simulation1JSON simulationId1DataUpdate return token|
 	simulation1Data := ZnEntity json: (NeoJSONWriter toString: { 
 				                    ('username' -> (simulation1 at: 'username')).
 				                    ('model' -> (simulation1 at: 'model')).
@@ -148,18 +148,23 @@ RMSServerTest >> testUpdateSimulation [
 				                    asDictionary).
 	simulation1JSON := NeoJSONReader fromString: simulation1Data.
 
-	ZnClient new
+	return := ZnClient new
 		url: 'http://localhost:10000/api/register';
 		entity: simulation1Data;
 		post.
-
+		
+	"we get the token to use it in the put command"
+	token := (NeoJSONReader fromString:return) at:'token'. 
+	
 	" Use update command "
 	simulationId1DataUpdate := ZnEntity json:
 		                           (NeoJSONWriter toString: { 
 				                            ('username'
 				                             -> (simulation1 at: 'username')).
 				                            ('model' -> (simulation1 at: 'model')).
-				                            ('progress' -> 1.0) } asDictionary).
+				                            ('progress' -> 1.0). 
+													('token' -> token)
+				} asDictionary).
 	" Update progress"
 	ZnClient new
 		url: 'http://localhost:10000/api/runs/1';
