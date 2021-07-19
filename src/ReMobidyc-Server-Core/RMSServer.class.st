@@ -152,7 +152,7 @@ RMSServer >> registerRoutes [
 		GET: '/api/runs/' -> (Send message: #getSimulations: to: self);
 		GET: '/api/runs/<id:IsInteger>' -> (Send message: #getSpecificSimulationById: to: self); 
 		PUT: '/api/runs/<id:IsInteger>' -> (Send message: #refreshSimulationState: to:self); 
-		DELETE: '/api/runs/<id:IsInteger>' -> (Send message:#removeSimulation: to: self). 
+		DELETE: '/api/runs/<id:IsInteger>/<token>' -> (Send message:#removeSimulation: to: self). 
 ]
 
 { #category : #path }
