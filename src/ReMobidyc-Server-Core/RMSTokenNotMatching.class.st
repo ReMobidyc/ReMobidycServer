@@ -7,6 +7,12 @@ Class {
 	#category : #'ReMobidyc-Server-Core-ReMobidyc-Server-Core'
 }
 
+{ #category : #signalling }
+RMSTokenNotMatching class >> signalWithToken: aToken [
+
+	(self new initializeToken: aToken) signal: 'The token does not match. Your token :', aToken asString. 
+]
+
 { #category : #initialization }
 RMSTokenNotMatching >> initializeToken: aToken [
 	token:= aToken. 
