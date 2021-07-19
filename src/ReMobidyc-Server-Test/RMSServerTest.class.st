@@ -186,6 +186,43 @@ RMSServerTest >> testUpdateSimulation [
 	self assert: (simulationId1 at: 'progress') equals: 1.0
 ]
 
+{ #category : #tests }
+RMSServerTest >> testUpdateSimulationWithBadToken [
+
+	| simulationId1 simulation1Data simulation1JSON simulationId1DataUpdate  putResponse|
+	simulation1Data := ZnEntity json: (NeoJSONWriter toString: { 
+				                    ('username' -> (simulation1 at: 'username')).
+				                    ('model' -> (simulation1 at: 'model')).
+				                    ('progress' -> (simulation1 at: 'progress')) }
+				                    asDictionary).
+	simulation1JSON := NeoJSONReader fromString: simulation1Data.
+
+	   ZnClient new
+		url: 'http://localhost:10000/api/register';
+		entity: simulation1Data;
+		post.
+
+	
+	" Use update command "
+	simulationId1DataUpdate := ZnEntity json:
+		                           (NeoJSONWriter toString: { 
+				                            ('username'
+				                             -> (simulation1 at: 'username')).
+				                            ('model' -> (simulation1 at: 'model')).
+				                            ('progress' -> 1.0). 
+													('token' -> 'badToken')
+				} asDictionary).
+	" Update progress"
+	putResponse:= NeoJSONReader fromString:(ZnClient new
+		url: 'http://localhost:10000/api/runs/1';
+		entity: simulationId1DataUpdate;
+		put).
+
+	" Comparaisons "
+	self assert: (putResponse  at: 'code') equals:'OPERATION_DENIED'. 
+		
+]
+
 { #category : #accessing }
 RMSServerTest >> url [
 	^ 'http://localhost:', self port asString ,'/api/'. 
