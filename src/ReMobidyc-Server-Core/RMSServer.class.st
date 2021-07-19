@@ -168,7 +168,7 @@ RMSServer >> registerSimulation: request [
 { #category : #path }
 RMSServer >> removeSimulation: request [
 
-	^ simulations removeSimulation:(request at:#id). 
+	^ simulations removeSimulation: (request at: 'id') token: (request at: 'token')
 ]
 
 { #category : #'error handler' }
