@@ -81,6 +81,20 @@ RMSServer >> createSimulation: request [
 	} asDictionary
 ]
 
+{ #category : #private }
+RMSServer >> createSimulationForRefresh: request [
+	|object|
+	
+	object := NeoJSONReader fromString: request entity contents.
+	^ { 
+		  ('username' -> (object at: 'username')).
+		  ('model' -> (object at: 'model')).
+		  ('progress' -> (object at: 'progress')).
+		  ('state' -> 'running').
+		  ('token' -> (object at:'token'))		
+	} asDictionary
+]
+
 { #category : #path }
 RMSServer >> getSimulations: request [ 
 	^ simulations getSimulationsValues. 
