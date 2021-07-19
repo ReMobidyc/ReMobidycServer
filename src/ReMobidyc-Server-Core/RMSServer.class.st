@@ -138,7 +138,8 @@ RMSServer >> registerErrorHandlers [
 
 	teapot 
 	exception: RMSSimulationNotFound   -> (Send message:#simulationNotFound:request: to:self);
-	exception: KeyNotFound -> (Send message:#missingParam:request: to:self); 
+	exception: KeyNotFound -> (Send message:#missingParam:request: to:self);
+	exception: RMSTokenNotMatching ->(Send message:#tokenNotMatching:request: to:self);
 	exception: Error ->(TeaResponse serverError body:{#code ->'ERROR'} asDictionary)
 ]
 
@@ -196,4 +197,13 @@ RMSServer >> stop [
 	
 	teapot stop. 
 	^ self.
+]
+
+{ #category : #'error handler' }
+RMSServer >> tokenNotMatching: aTokenNotMatching request: aZnRequest [ 
+	
+	^ TeaResponse badRequest body: { 
+			  #code -> 'OPERATION_DENIED'.
+			  #message -> ('Token does not match : ' , aTokenNotMatching token) }
+			  asDictionary
 ]
