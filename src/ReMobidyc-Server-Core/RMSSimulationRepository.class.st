@@ -80,9 +80,13 @@ RMSSimulationRepository >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-RMSSimulationRepository >> removeSimulation: anId [
+RMSSimulationRepository >> removeSimulation: anId token: aToken [
+	
+	| simulationToken |
+	simulationToken := (self getSimulationById: anId) at: 'token'.
 
-	^ simulations removeKey: anId ifAbsent: [ RMSSimulationNotFound signalWithSimulationId: anId ]. 
+	aToken = simulationToken ifTrue:[^ simulations removeKey: anId ifAbsent: [ RMSSimulationNotFound signalWithSimulationId: anId ]]
+	ifFalse:[RMSTokenNotMatching signalWithToken: aToken] 
 ]
 
 { #category : #'as yet unclassified' }
