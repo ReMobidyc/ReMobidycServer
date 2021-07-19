@@ -76,7 +76,9 @@ RMSServer >> createSimulation: request [
 		  ('username' -> (object at: 'username')).
 		  ('model' -> (object at: 'model')).
 		  ('progress' -> (object at: 'progress')).
-		  ('state' -> 'running') } asDictionary
+		  ('state' -> 'running').
+		  ('token' -> (RMSTokenGenerator size:10))		
+	} asDictionary
 ]
 
 { #category : #path }
