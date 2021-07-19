@@ -103,6 +103,15 @@ RMSServer >> initializePort: port [
 		  yourself
 ]
 
+{ #category : #'error handler' }
+RMSServer >> missingParam: aKeyNotFoundError request: aZnRequest [
+
+	^ TeaResponse badRequest body: { 
+			  #code -> 'UNPROCESSABLE_ENTITY'.
+			  #message -> ('Missing parameter: ' , aKeyNotFoundError key) }
+			  asDictionary
+]
+
 { #category : #path }
 RMSServer >> refreshSimulationState: request [
 	^ simulations replaceSimulation: (request at: 'id') with: (self createSimulation: request)
