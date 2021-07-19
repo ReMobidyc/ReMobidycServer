@@ -130,7 +130,7 @@ RMSServer >> missingParam: aKeyNotFoundError request: aZnRequest [
 
 { #category : #path }
 RMSServer >> refreshSimulationState: request [
-	^ simulations replaceSimulation: (request at: 'id') with: (self createSimulation: request)
+	^ simulations replaceSimulation: (request at: 'id') with: (self createSimulationForRefresh:  request)
 ]
 
 { #category : #initialization }
