@@ -1,3 +1,18 @@
+"
+I represent a simulaton repository. My main responsability is to store registered simulations.
+
+I'm using dictionary data structure to store registered simulations. 
+
+Dictionary keys are simulations ID which is a RMSTokenGenerator object. 
+Dictionary values are simulations informations. 
+
+
+ 
+Internal Representation and Key Implementation Points.
+
+   Instance Variables
+	simulations:		a Dictionary object which contains all simulations.
+"
 Class {
 	#name : #RMSSimulationRepository,
 	#superclass : #Object,
