@@ -67,7 +67,7 @@ RMSServer class >> serveOn: port [
 		  start
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 RMSServer >> createSimulation: request [
 	|object|
 	
@@ -79,12 +79,12 @@ RMSServer >> createSimulation: request [
 		  ('state' -> 'running') } asDictionary
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #path }
 RMSServer >> getSimulations: request [ 
 	^ simulations getSimulationsValues. 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #path }
 RMSServer >> getSpecificSimulationById: request [
 	^ simulations getSimulationById: (request at:#id). 
 ]
@@ -103,7 +103,7 @@ RMSServer >> initializePort: port [
 		  yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #path }
 RMSServer >> refreshSimulationState: request [
 	^ simulations replaceSimulation: (request at: 'id') with: (self createSimulation: request)
 ]
@@ -127,7 +127,7 @@ RMSServer >> registerRoutes [
 		DELETE: '/api/runs/<id:IsInteger>' -> (Send message:#removeSimulation: to: self). 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #path }
 RMSServer >> registerSimulation: request [
 
 	| simulation |
@@ -137,18 +137,18 @@ RMSServer >> registerSimulation: request [
 		  location: '/runs/' , (simulation at: #id) asString
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #path }
 RMSServer >> removeSimulation: request [
 
 	^ simulations removeSimulation:(request at:#id). 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'error handler' }
 RMSServer >> simulationNotFound: aSimulation request: aZnRequest [
 
 	^ TeaResponse notFound body:{
 		#code -> 'NOT_FOUND'.
-		#message -> ('No such simulation; ', aSimulation simulationId asString)
+		#message -> ('No such simulation; ', aSimulation runId asString)
 	} asDictionary. 
 ]
 
