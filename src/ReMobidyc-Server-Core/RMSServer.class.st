@@ -108,11 +108,13 @@ RMSServer >> refreshSimulationState: request [
 	^ simulations replaceSimulation: (request at: 'id') with: (self createSimulation: request)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 RMSServer >> registerErrorHandlers [
 
 	teapot 
-	exception: RMSSimulationNotFound   -> (Send message:#simulationNotFound:request: to:self)
+	exception: RMSSimulationNotFound   -> (Send message:#simulationNotFound:request: to:self);
+	exception: KeyNotFound -> (Send message:#missingParam:request: to:self); 
+	exception: Error ->(TeaResponse serverError body:{#code ->'ERROR'} asDictionary)
 ]
 
 { #category : #initialization }
