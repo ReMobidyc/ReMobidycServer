@@ -108,22 +108,24 @@ RMSServerTest >> testGetSpecificSimulationById [
 { #category : #tests }
 RMSServerTest >> testRemoveSimulation [
 
-	| simulationId1 simulation1Data simulation1JSON |
+	| simulationId1 simulation1Data return token|
 	simulation1Data := ZnEntity json: (NeoJSONWriter toString: { 
 				                    ('username' -> (simulation1 at: 'username')).
 				                    ('model' -> (simulation1 at: 'model')).
 				                    ('progress' -> (simulation1 at: 'progress')) }
 				                    asDictionary).
 
-	ZnClient new
+	return := ZnClient new
 		url: 'http://localhost:10000/api/register';
 		entity: simulation1Data;
 		post.
-
+		
+	"we get the token to use it in the put command"
+	token := (NeoJSONReader fromString:return) at:'token'. 
 
 	" delete command"
 	ZnClient new
-		url: 'http://localhost:10000/api/runs/1';
+		url: 'http://localhost:10000/api/runs/1','/',token;
 		delete. 
 		
 	" Get the simulation informations from our API"
