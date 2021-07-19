@@ -1,3 +1,13 @@
+"
+I represent an Exception, I'm raised when user wants to do a command (read, update, delete) on a simulation that does not exist yet. 
+ 
+Internal Representation.
+
+    Instance Variables
+	runId:		<Object> a unique id.
+
+
+"
 Class {
 	#name : #RMSSimulationNotFound,
 	#superclass : #Error,
@@ -20,6 +30,6 @@ RMSSimulationNotFound >> initializeSimulationId: anId [
 ]
 
 { #category : #initialization }
-RMSSimulationNotFound >> simulationId [ 
+RMSSimulationNotFound >> runId [ 
 	^ simulationId. 
 ]
