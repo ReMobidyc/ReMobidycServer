@@ -1,3 +1,13 @@
+"
+I represent an Exception, I'm raised when user wants to do a command (update, delete) with bad token. 
+ 
+Internal Representation.
+
+    Instance Variables
+	token:	 user token.
+
+
+"
 Class {
 	#name : #RMSTokenNotMatching,
 	#superclass : #Error,
