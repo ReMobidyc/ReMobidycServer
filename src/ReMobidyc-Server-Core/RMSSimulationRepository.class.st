@@ -88,8 +88,15 @@ RMSSimulationRepository >> removeSimulation: anId [
 { #category : #'as yet unclassified' }
 RMSSimulationRepository >> replaceSimulation: simulationId with: aDictionary [
 
-	^ simulations at: simulationId put:(aDictionary copyWith: #id -> simulationId). 
-	
+	| simulationToken |
+	simulationToken := (self getSimulationById: simulationId) at: 'token'.
+
+	(aDictionary at: 'token') = simulationToken
+		ifTrue: [ 
+			^ simulations
+				  at: simulationId
+				  put: (aDictionary copyWith: #id -> simulationId) ]
+		ifFalse: [ RMSTokenNotMatching signalWithToken: (aDictionary at:'token') ]
 ]
 
 { #category : #'as yet unclassified' }
