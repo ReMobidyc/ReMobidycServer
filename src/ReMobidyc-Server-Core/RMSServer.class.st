@@ -113,7 +113,9 @@ RMSServer >> getSimulations: request [
 
 { #category : #path }
 RMSServer >> getSpecificSimulationById: request [
-	^ simulations getSimulationById: (request at:#id). 
+
+	 ^ self createSimulationWithoutToken:(simulations getSimulationById: (request at:#id)). 
+
 ]
 
 { #category : #initialization }
