@@ -89,27 +89,26 @@ RMSSimulationRepository >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-RMSSimulationRepository >> removeSimulation: anId token: aToken [
-	
-	| simulationToken |
-	simulationToken := (self getSimulationById: anId) at: 'token'.
+RMSSimulationRepository >> removeSimulation: runId token: aToken [
 
-	aToken = simulationToken ifTrue:[^ simulations removeKey: anId ifAbsent: [ RMSSimulationNotFound signalWithSimulationId: anId ]]
-	ifFalse:[RMSTokenNotMatching signalWithToken: aToken] 
+	(self checkTokenId: runId userToken: aToken)
+		ifTrue: [ 
+			^ simulations
+				  removeKey: runId
+				  ifAbsent: [ RMSSimulationNotFound signalWithSimulationId: runId ] ]
+		ifFalse: [ RMSTokenNotMatching signalWithToken: aToken ]
 ]
 
 { #category : #'as yet unclassified' }
 RMSSimulationRepository >> replaceSimulation: simulationId with: aDictionary [
 
-	| simulationToken |
-	simulationToken := (self getSimulationById: simulationId) at: 'token'.
-
-	(aDictionary at: 'token') = simulationToken
+	(self checkTokenId: simulationId userToken: (aDictionary at: 'token'))
 		ifTrue: [ 
 			^ simulations
 				  at: simulationId
 				  put: (aDictionary copyWith: #id -> simulationId) ]
-		ifFalse: [ RMSTokenNotMatching signalWithToken: (aDictionary at:'token') ]
+		ifFalse: [ 
+		RMSTokenNotMatching signalWithToken: (aDictionary at: 'token') ]
 ]
 
 { #category : #'as yet unclassified' }
