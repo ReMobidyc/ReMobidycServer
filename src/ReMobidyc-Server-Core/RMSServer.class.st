@@ -95,6 +95,17 @@ RMSServer >> createSimulationForRefresh: request [
 	} asDictionary
 ]
 
+{ #category : #'as yet unclassified' }
+RMSServer >> createSimulationWithoutToken: simulation [ 
+
+	^ { 
+		  ('username' -> (simulation at: 'username')).
+		  ('model' -> (simulation at: 'model')).
+		  ('progress' -> (simulation at: 'progress')).
+		  ('state' -> 'running').		
+	} asDictionary
+]
+
 { #category : #path }
 RMSServer >> getSimulations: request [ 
 	^ simulations getSimulationsValues. 
