@@ -51,9 +51,10 @@ RMSSimulationRepository >> checkTokenId: runId userToken: aToken [
 { #category : #'as yet unclassified' }
 RMSSimulationRepository >> getSimulationById: simulationId [
 
-	^ simulations 
+	^ simulations
 		  at: simulationId
-		  ifAbsent: [ RMSSimulationNotFound signalWithSimulationId: simulationId ]
+		  ifAbsent: [ 
+		  RMSSimulationNotFound signalWithSimulationId: simulationId ]
 ]
 
 { #category : #accessing }

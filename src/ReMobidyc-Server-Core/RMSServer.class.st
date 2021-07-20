@@ -147,6 +147,7 @@ RMSServer >> refreshSimulationState: request [
 	^ simulations
 		  replaceSimulation: (request at: 'id')
 		  with: (self createSimulationForRefresh: request)
+
 ]
 
 { #category : #initialization }
