@@ -61,7 +61,7 @@ RMSSimulationRepository >> getSimulationsValues [
 	^ simulations values. 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 RMSSimulationRepository >> getSize [
 	^ simulations size.  
 ]
