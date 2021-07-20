@@ -108,7 +108,13 @@ RMSServer >> createSimulationWithoutToken: simulation [
 
 { #category : #path }
 RMSServer >> getSimulations: request [ 
-	^ simulations getSimulationsValues. 
+	
+		|simulationsValuesWithoutToken|
+	
+	simulationsValuesWithoutToken := Dictionary new. 
+	simulations simulations valuesDo:[:value|  simulationsValuesWithoutToken at:(value at:'id') put:(self createSimulationWithoutToken: value) ].
+	^ simulationsValuesWithoutToken values. 
+	"^ simulations getSimulationsValues."
 ]
 
 { #category : #path }
