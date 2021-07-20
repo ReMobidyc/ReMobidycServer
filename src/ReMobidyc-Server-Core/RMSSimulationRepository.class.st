@@ -40,6 +40,15 @@ RMSSimulationRepository >> addSimulation: aDictionary [
 ]
 
 { #category : #'as yet unclassified' }
+RMSSimulationRepository >> checkTokenId: runId userToken: aToken [
+
+	| simulationToken |
+	simulationToken := (self getSimulationById: runId) at: 'token'.
+
+	^ aToken = simulationToken
+]
+
+{ #category : #'as yet unclassified' }
 RMSSimulationRepository >> getSimulationById: simulationId [
 
 	^ simulations 
