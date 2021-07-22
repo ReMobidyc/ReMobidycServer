@@ -170,12 +170,25 @@ RMSServer >> registerErrorHandlers [
 RMSServer >> registerRoutes [
 
 	teapot
-		GET: '/' -> '<h1> reMobidycServer API V0.0.1</h1>';output: #html;
+		after: '/*' -> [ :req :resp | 
+				resp headers at: 'Access-Control-Allow-Origin' put: '*'.
+				resp headers
+					at: 'Access-Control-Allow-Methods'
+					put: 'POST,GET,OPTIONS,DELETE,PUT'.
+				resp headers
+					at: 'Access-Control-Allow-Headers'
+					put: 'Content-Type,Authorization' ];
+		GET: '/' -> '<h1> reMobidycServer API V0.0.1</h1>';
+		output: #html;
+		OPTIONS: '/api/register' -> '';
 		POST: '/api/register' -> (Send message: #registerSimulation: to: self);
 		GET: '/api/runs/' -> (Send message: #getSimulations: to: self);
-		GET: '/api/runs/<id:IsInteger>' -> (Send message: #getSpecificSimulationById: to: self); 
-		PUT: '/api/runs/<id:IsInteger>' -> (Send message: #refreshSimulationState: to:self); 
-		DELETE: '/api/runs/<id:IsInteger>/<token>' -> (Send message:#removeSimulation: to: self). 
+		GET: '/api/runs/<id:IsInteger>'
+			-> (Send message: #getSpecificSimulationById: to: self);
+		PUT: '/api/runs/<id:IsInteger>'
+			-> (Send message: #refreshSimulationState: to: self);
+		DELETE: '/api/runs/<id:IsInteger>/<token>'
+			-> (Send message: #removeSimulation: to: self)
 ]
 
 { #category : #path }
