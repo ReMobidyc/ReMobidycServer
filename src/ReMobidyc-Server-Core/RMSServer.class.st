@@ -196,6 +196,7 @@ RMSServer >> registerSimulation: request [
 
 	| simulation |
 	simulation := simulations addSimulation: (self createSimulation: request).
+	
 	^ TeaResponse created
 		  body: simulation;
 		  location: '/runs/' , (simulation at: #id) asString
@@ -223,9 +224,9 @@ RMSServer >> simulations [
 
 { #category : #accessing }
 RMSServer >> start [
-	
-	teapot start. 
-	^self 
+
+	teapot start.
+	^ self
 ]
 
 { #category : #accessing }

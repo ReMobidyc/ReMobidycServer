@@ -59,7 +59,7 @@ RMSSimulationRepository >> getSimulationById: simulationId [
 
 { #category : #accessing }
 RMSSimulationRepository >> getSimulationsValues [ 
-	^ simulations values. 
+	^ simulations values.
 ]
 
 { #category : #accessing }
