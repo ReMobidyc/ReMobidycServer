@@ -99,6 +99,7 @@ RMSServer >> createSimulationForRefresh: request [
 RMSServer >> createSimulationWithoutToken: simulation [ 
 
 	^ { 
+		  ('id' -> (simulation at:'id')).
 		  ('username' -> (simulation at: 'username')).
 		  ('model' -> (simulation at: 'model')).
 		  ('progress' -> (simulation at: 'progress')).
