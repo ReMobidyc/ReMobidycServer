@@ -193,7 +193,7 @@ RMSServer >> registerRoutes [
 			-> (Send message: #getSpecificSimulationById: to: self);
 		PUT: '/api/runs/<id:IsInteger>'
 			-> (Send message: #refreshSimulationState: to: self);
-		DELETE: '/api/runs/<id:IsInteger>/<token>'
+		DELETE: '/api/runs/<id:IsInteger>'
 			-> (Send message: #removeSimulation: to: self)
 ]
 
@@ -210,8 +210,9 @@ RMSServer >> registerSimulation: request [
 
 { #category : #path }
 RMSServer >> removeSimulation: request [
-
-	^ simulations removeSimulation: (request at: 'id') token: (request at: 'token')
+	^ simulations
+		removeSimulation: (request at: 'id')
+		token: ((self readRequestParameters: request) at: 'token' ifAbsent: [ nil ])
 ]
 
 { #category : #'error handler' }
