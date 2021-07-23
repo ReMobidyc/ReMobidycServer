@@ -148,6 +148,11 @@ RMSServer >> missingParam: aKeyNotFoundError request: aZnRequest [
 			  asDictionary
 ]
 
+{ #category : #private }
+RMSServer >> readRequestParameters: request [
+	^ NeoJSONReader fromString: request entity contents
+]
+
 { #category : #path }
 RMSServer >> refreshSimulationState: request [
 
