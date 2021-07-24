@@ -106,31 +106,38 @@ RMSServerTest >> testGetSpecificSimulationById [
 
 { #category : #tests }
 RMSServerTest >> testRemoveSimulation [
-
 	| simulationId1 simulation1Data return token |
-	simulation1Data := ZnEntity json: (NeoJSONWriter toString: { 
-				                    ('username' -> (simulation1 at: 'username')).
-				                    ('model' -> (simulation1 at: 'model')).
-				                    ('progress' -> (simulation1 at: 'progress')) }
-				                    asDictionary).
-
+	simulation1Data := ZnEntity
+		json:
+			(NeoJSONWriter
+				toString:
+					{('username' -> (simulation1 at: 'username')).
+					('model' -> (simulation1 at: 'model')).
+					('progress' -> (simulation1 at: 'progress'))} asDictionary).
 	return := ZnClient new
-		          url: 'http://localhost:10000/api/register';
-		          entity: simulation1Data;
-		          post.
+		url: 'http://localhost:10000/api/register';
+		entity: simulation1Data;
+		post.
 
 	"we get the token to use it in the put command"
 	token := (NeoJSONReader fromString: return) at: 'token'.
 
 	" delete command"
 	ZnClient new
-		url: 'http://localhost:10000/api/runs/1' , '/' , token;
+		beOneShot;
+		optionAt: #autoResetEntityMethods put: #(HEAD);
+		url: 'http://localhost:10000/api/runs/1';
+		entity:
+			(ZnEntity
+				json: (NeoJSONWriter toString: {('token' -> token)} asDictionary));
 		delete.
 
 	" Get the simulation informations from our API"
-	simulationId1 := NeoJSONReader fromString: (ZnClient new
-			                  url: self url , 'runs/1';
-			                  get).
+	simulationId1 := NeoJSONReader
+		fromString:
+			(ZnClient new
+				url: self url , 'runs/1';
+				get).
 	" Comparaisons simulation not found "
 	self assert: (simulationId1 at: 'code') equals: 'NOT_FOUND'.
 	self
@@ -140,13 +147,14 @@ RMSServerTest >> testRemoveSimulation [
 
 { #category : #tests }
 RMSServerTest >> testRemoveSimulationWithBadToken [
-
 	| simulationId1 simulation1Data simulation1JSON responseDelete |
-	simulation1Data := ZnEntity json: (NeoJSONWriter toString: { 
-				                    ('username' -> (simulation1 at: 'username')).
-				                    ('model' -> (simulation1 at: 'model')).
-				                    ('progress' -> (simulation1 at: 'progress')) }
-				                    asDictionary).
+	simulation1Data := ZnEntity
+		json:
+			(NeoJSONWriter
+				toString:
+					{('username' -> (simulation1 at: 'username')).
+					('model' -> (simulation1 at: 'model')).
+					('progress' -> (simulation1 at: 'progress'))} asDictionary).
 	simulation1JSON := NeoJSONReader fromString: simulation1Data.
 	ZnClient new
 		url: 'http://localhost:10000/api/register';
@@ -156,15 +164,22 @@ RMSServerTest >> testRemoveSimulationWithBadToken [
 
 
 	" delete command"
-	responseDelete := NeoJSONReader fromString: (ZnClient new
-			                   url:
-				                   'http://localhost:10000/api/runs/1/badToken';
-			                   delete).
+	responseDelete := NeoJSONReader
+		fromString:
+			(ZnClient new
+				optionAt: #autoResetEntityMethods put: #(HEAD);
+				url: 'http://localhost:10000/api/runs/1';
+				entity:
+					(ZnEntity
+						json: (NeoJSONWriter toString: {('token' -> 'badToken')} asDictionary));
+				delete).
 
 	" Get the simulation informations from our API"
-	simulationId1 := NeoJSONReader fromString: (ZnClient new
-			                  url: self url , 'runs/1';
-			                  get).
+	simulationId1 := NeoJSONReader
+		fromString:
+			(ZnClient new
+				url: self url , 'runs/1';
+				get).
 	" See if we get the OPERATION_DENIED result "
 	self assert: (responseDelete at: 'code') equals: 'OPERATION_DENIED'.
 
