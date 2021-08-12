@@ -59,7 +59,17 @@ Class {
 	#category : #'ReMobidyc-Server-Core-ReMobidyc-Server-Core'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #defaults }
+RMSServer class >> defaultPort [ 
+	^ 2222
+]
+
+{ #category : #services }
+RMSServer class >> serve [
+	^ self serveOn: self defaultPort
+]
+
+{ #category : #services }
 RMSServer class >> serveOn: port [
 
 	^ self new
@@ -95,7 +105,7 @@ RMSServer >> createSimulationForRefresh: request [
 	} asDictionary
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 RMSServer >> createSimulationWithoutToken: simulation [ 
 
 	^ { 
