@@ -28,54 +28,55 @@ RMSServerTest >> setUp [
 
 { #category : #tests }
 RMSServerTest >> testGetSimulations [
-
 	"add 3 simulations"
 
 	| simulation1JSON simulation2JSON simulation3JSON |
-	simulation1JSON := ZnEntity json: (NeoJSONWriter toString: { 
-				                    ('username' -> (simulation1 at: 'username')).
-				                    ('model' -> (simulation1 at: 'model')).
-				                    ('progress' -> (simulation1 at: 'progress')) }
-				                    asDictionary).
-	simulation3JSON := ZnEntity json: (NeoJSONWriter toString: { 
-				                    ('username' -> (simulation3 at: 'username')).
-				                    ('model' -> (simulation3 at: 'model')).
-				                    ('progress' -> (simulation3 at: 'progress')) }
-				                    asDictionary).
-	simulation2JSON := ZnEntity json: (NeoJSONWriter toString: { 
-				                    ('username' -> (simulation2 at: 'username')).
-				                    ('model' -> (simulation2 at: 'model')).
-				                    ('progress' -> (simulation2 at: 'progress')) }
-				                    asDictionary).
+	simulation1JSON := ZnEntity
+		json:
+			(NeoJSONWriter
+				toString:
+					{('username' -> (simulation1 at: 'username')).
+					('model' -> (simulation1 at: 'model')).
+					('progress' -> (simulation1 at: 'progress'))} asDictionary).
+	simulation3JSON := ZnEntity
+		json:
+			(NeoJSONWriter
+				toString:
+					{('username' -> (simulation3 at: 'username')).
+					('model' -> (simulation3 at: 'model')).
+					('progress' -> (simulation3 at: 'progress'))} asDictionary).
+	simulation2JSON := ZnEntity
+		json:
+			(NeoJSONWriter
+				toString:
+					{('username' -> (simulation2 at: 'username')).
+					('model' -> (simulation2 at: 'model')).
+					('progress' -> (simulation2 at: 'progress'))} asDictionary).
 	ZnClient new
 		url: self url , 'register';
 		entity: simulation1JSON;
 		post.
-
 	ZnClient new
 		url: self url , 'register';
 		entity: simulation2JSON;
 		post.
-
 	ZnClient new
 		url: self url , 'register';
 		entity: simulation3JSON;
 		post.
-
-	self assert: server simulations getSize equals: 3
+	self assert: server simulations simulations size equals: 3
 ]
 
 { #category : #tests }
 RMSServerTest >> testGetSpecificSimulationById [
-
-	""
-
 	| simulationId1 simulation1Data simulation1JSON |
-	simulation1Data := ZnEntity json: (NeoJSONWriter toString: { 
-				                    ('username' -> (simulation1 at: 'username')).
-				                    ('model' -> (simulation1 at: 'model')).
-				                    ('progress' -> (simulation1 at: 'progress')) }
-				                    asDictionary).
+	simulation1Data := ZnEntity
+		json:
+			(NeoJSONWriter
+				toString:
+					{('username' -> (simulation1 at: 'username')).
+					('model' -> (simulation1 at: 'model')).
+					('progress' -> (simulation1 at: 'progress'))} asDictionary).
 	"convert our data in JSON format to compare with the get command result"
 	simulation1JSON := NeoJSONReader fromString: simulation1Data contents.
 
@@ -87,8 +88,8 @@ RMSServerTest >> testGetSpecificSimulationById [
 		post.
 	" get the simulation from our API"
 	simulationId1 := ZnClient new
-		                 url: self url , 'runs/1';
-		                 get.
+		url: self url , 'runs/1';
+		get.
 	" convert get result to JSON format"
 	simulationId1 := NeoJSONReader fromString: simulationId1.
 

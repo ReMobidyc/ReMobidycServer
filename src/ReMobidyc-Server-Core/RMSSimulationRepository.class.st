@@ -18,98 +18,60 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'simulations',
-		'id'
+		'lastIssuedId'
 	],
 	#category : #'ReMobidyc-Server-Core-ReMobidyc-Server-Core'
 }
 
-{ #category : #'as yet unclassified' }
-RMSSimulationRepository class >> id: anId username: aUsername model: aModel progress: aProgress [
-	
-	^ self new id: anId; username: aUsername; model: aModel ; progress: aProgress. 
-]
-
 { #category : #adding }
 RMSSimulationRepository >> addSimulation: aDictionary [
-
 	| simulationId |
 	simulationId := self getUniqueId.
 	^ simulations
-		  at: simulationId
-		  put: (aDictionary copyWith: #id -> simulationId)
+		at: simulationId
+		put:
+			(aDictionary
+				at: #id put: simulationId;
+				yourself)
 ]
 
 { #category : #'as yet unclassified' }
-RMSSimulationRepository >> checkTokenId: runId userToken: aToken [
-
-	| simulationToken |
-	simulationToken := (self getSimulationById: runId) at: 'token'.
-
-	^ aToken = simulationToken
+RMSSimulationRepository >> checkToken: aString runId: runIdString [
+	aString = ((self getSimulationById: runIdString) at: 'token')
+		ifFalse: [ ^ RMSTokenNotMatching signalWithToken: aString ]
 ]
 
 { #category : #'as yet unclassified' }
 RMSSimulationRepository >> getSimulationById: simulationId [
-
 	^ simulations
-		  at: simulationId
-		  ifAbsent: [ 
-		  RMSSimulationNotFound signalWithSimulationId: simulationId ]
-]
-
-{ #category : #accessing }
-RMSSimulationRepository >> getSimulationsValues [ 
-	^ simulations values.
-]
-
-{ #category : #accessing }
-RMSSimulationRepository >> getSize [
-	^ simulations size.  
+		at: simulationId
+		ifAbsent: [ RMSSimulationNotFound signalWithSimulationId: simulationId ]
 ]
 
 { #category : #adding }
 RMSSimulationRepository >> getUniqueId [ 
-	^ id := id + 1. 
-]
-
-{ #category : #accessing }
-RMSSimulationRepository >> id [ 
-	^ id. 
-]
-
-{ #category : #accessing }
-RMSSimulationRepository >> id: anId [
-	id := anId. 
+	^ lastIssuedId := lastIssuedId + 1. 
 ]
 
 { #category : #accessing }
 RMSSimulationRepository >> initialize [ 
 	super initialize. 
 	simulations := Dictionary new. 
-	id := 0. 
+	lastIssuedId := 0. 
 ]
 
 { #category : #'as yet unclassified' }
-RMSSimulationRepository >> removeSimulation: runId token: aToken [
-
-	(self checkTokenId: runId userToken: aToken)
-		ifTrue: [ 
-			^ simulations
-				  removeKey: runId
-				  ifAbsent: [ RMSSimulationNotFound signalWithSimulationId: runId ] ]
-		ifFalse: [ RMSTokenNotMatching signalWithToken: aToken ]
+RMSSimulationRepository >> removeSimulation: runId token: aString [
+	self checkToken: aString runId: runId.
+	^ simulations
+		removeKey: runId
+		ifAbsent: [ RMSSimulationNotFound signalWithSimulationId: runId ]
 ]
 
 { #category : #'as yet unclassified' }
-RMSSimulationRepository >> replaceSimulation: simulationId with: aDictionary [
-
-	(self checkTokenId: simulationId userToken: (aDictionary at: 'token'))
-		ifTrue: [ 
-			^ simulations
-				  at: simulationId
-				  put: (aDictionary copyWith: #id -> simulationId) ]
-		ifFalse: [ 
-		RMSTokenNotMatching signalWithToken: (aDictionary at: 'token') ]
+RMSSimulationRepository >> replaceSimulation: runId with: aDictionary [
+	self checkToken: (aDictionary at: 'token') runId: runId.
+	^ simulations at: runId put: (aDictionary copyWith: #id -> runId)
 ]
 
 { #category : #'as yet unclassified' }

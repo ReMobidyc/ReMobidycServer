@@ -56,8 +56,16 @@ Class {
 		'teapot',
 		'simulations'
 	],
+	#classVars : [
+		'Current'
+	],
 	#category : #'ReMobidyc-Server-Core-ReMobidyc-Server-Core'
 }
+
+{ #category : #'sole instance' }
+RMSServer class >> current [
+	^ Current ifNil: [ Current := self new ]
+]
 
 { #category : #defaults }
 RMSServer class >> defaultPort [ 
@@ -65,16 +73,25 @@ RMSServer class >> defaultPort [
 ]
 
 { #category : #services }
-RMSServer class >> serve [
-	^ self serveOn: self defaultPort
+RMSServer class >> serveOn: port [
+	^ self new
+		initializePort: port;
+		start
 ]
 
 { #category : #services }
-RMSServer class >> serveOn: port [
+RMSServer class >> start [
+	<script: 'RMSServer start'>
+	^ self current
+		stop;
+		initializePort: self defaultPort;
+		start
+]
 
-	^ self new
-		  initializePort: port;
-		  start
+{ #category : #services }
+RMSServer class >> stop [
+	<script: 'RMSServer stop'>
+	^ self current stop
 ]
 
 { #category : #private }
@@ -130,23 +147,23 @@ RMSServer >> getSimulations: request [
 
 { #category : #path }
 RMSServer >> getSpecificSimulationById: request [
-
-	 ^ self createSimulationWithoutToken:(simulations getSimulationById: (request at:#id)). 
-
+	^ self
+		createSimulationWithoutToken: (simulations getSimulationById: (request at: #id))
 ]
 
 { #category : #initialization }
 RMSServer >> initializePort: port [
-
 	simulations := RMSSimulationRepository new.
-	teapot := Teapot configure: { 
-			          (#defaultOutput -> #json).
-			          (#debugMode -> true).
-			          (#port -> port) }.
+	teapot ifNotNil: #stop.
+	teapot := Teapot
+		configure:
+			{(#defaultOutput -> #json).
+			(#debugMode -> true).
+			(#port -> port)}.
 	^ self
-		  registerRoutes;
-		  registerErrorHandlers;
-		  yourself
+		registerRoutes;
+		registerErrorHandlers;
+		yourself
 ]
 
 { #category : #'error handler' }
@@ -241,16 +258,12 @@ RMSServer >> simulations [
 
 { #category : #accessing }
 RMSServer >> start [
-
-	teapot start.
-	^ self
+	teapot ifNotNil: #start
 ]
 
 { #category : #accessing }
-RMSServer >> stop [ 
-	
-	teapot stop. 
-	^ self.
+RMSServer >> stop [
+	teapot ifNotNil: #stop
 ]
 
 { #category : #'error handler' }
