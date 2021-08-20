@@ -18,12 +18,16 @@ RMSServerTest >> port [
 { #category : #initialization }
 RMSServerTest >> setUp [
 	Teapot stopAll.
-	server:= RMSServer serveOn: self port. 
-	simulation1 := { #username -> 'korede'. #model -> 'test'. #progress -> '0.1' } asDictionary. 
-	simulation2 := { #username -> 'tomo'. #model -> 'sugar scape'. #progress -> '0.0' } asDictionary. 
-	simulation3 := { #username -> 'gael'. #model -> 'copepod'. #progress -> '0.68' } asDictionary. 
-
-        
+	server := RMSServer serveOn: self port.
+	simulation1 := {(#username -> 'korede').
+	(#model -> 'test').
+	(#progress -> '0.1')} asDictionary.
+	simulation2 := {(#username -> 'tomo').
+	(#model -> 'sugar scape').
+	(#progress -> '0.0')} asDictionary.
+	simulation3 := {(#username -> 'gael').
+	(#model -> 'copepod').
+	(#progress -> '0.68')} asDictionary
 ]
 
 { #category : #tests }
@@ -64,7 +68,7 @@ RMSServerTest >> testGetSimulations [
 		url: self url , 'register';
 		entity: simulation3JSON;
 		post.
-	self assert: server simulations simulations size equals: 3
+	self assert: server repository size equals: 3
 ]
 
 { #category : #tests }

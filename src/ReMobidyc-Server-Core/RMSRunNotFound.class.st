@@ -9,27 +9,27 @@ Internal Representation.
 
 "
 Class {
-	#name : #RMSSimulationNotFound,
+	#name : #RMSRunNotFound,
 	#superclass : #Error,
 	#instVars : [
-		'simulationId'
+		'runId'
 	],
 	#category : #'ReMobidyc-Server-Core-ReMobidyc-Server-Core'
 }
 
 { #category : #signalling }
-RMSSimulationNotFound class >> signalWithSimulationId: anId [
-
-	(self new initializeSimulationId: anId) signal: 'Simulation not found', anId asString. 
+RMSRunNotFound class >> signalWithRunId: aString [
+	(self new initializeRunId: aString)
+		signal: 'Run not found' , aString asString
 ]
 
 { #category : #initialization }
-RMSSimulationNotFound >> initializeSimulationId: anId [
-	simulationId := anId. 
-	^ self. 
+RMSRunNotFound >> initializeRunId: aString [
+	runId := aString.
+	^ self
 ]
 
 { #category : #initialization }
-RMSSimulationNotFound >> runId [ 
-	^ simulationId. 
+RMSRunNotFound >> runId [ 
+	^ runId. 
 ]

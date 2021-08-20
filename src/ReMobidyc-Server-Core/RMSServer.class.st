@@ -54,7 +54,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'teapot',
-		'simulations'
+		'repository'
 	],
 	#classVars : [
 		'Current'
@@ -72,11 +72,21 @@ RMSServer class >> defaultPort [
 	^ 2222
 ]
 
+{ #category : #'class initialization' }
+RMSServer class >> initialize [
+	SessionManager default registerUserClassNamed: self name
+]
+
 { #category : #services }
 RMSServer class >> serveOn: port [
 	^ self new
 		initializePort: port;
 		start
+]
+
+{ #category : #'class initialization' }
+RMSServer class >> shutDown: quitting [
+	self stop
 ]
 
 { #category : #services }
@@ -88,72 +98,25 @@ RMSServer class >> start [
 		start
 ]
 
+{ #category : #'class initialization' }
+RMSServer class >> startUp: resuming [
+	self start
+]
+
 { #category : #services }
 RMSServer class >> stop [
 	<script: 'RMSServer stop'>
 	^ self current stop
 ]
 
-{ #category : #private }
-RMSServer >> createSimulation: request [
-	|object|
-	
-	object := NeoJSONReader fromString: request entity contents.
-	^ { 
-		  ('username' -> (object at: 'username')).
-		  ('model' -> (object at: 'model')).
-		  ('progress' -> (object at: 'progress')).
-		  ('state' -> 'running').
-		  ('token' -> (RMSTokenGenerator size:10))		
-	} asDictionary
-]
-
-{ #category : #private }
-RMSServer >> createSimulationForRefresh: request [
-	|object|
-	
-	object := NeoJSONReader fromString: request entity contents.
-	^ { 
-		  ('username' -> (object at: 'username')).
-		  ('model' -> (object at: 'model')).
-		  ('progress' -> (object at: 'progress')).
-		  ('state' -> 'running').
-		  ('token' -> (object at:'token'))		
-	} asDictionary
-]
-
-{ #category : #private }
-RMSServer >> createSimulationWithoutToken: simulation [ 
-
-	^ { 
-		  ('id' -> (simulation at:'id')).
-		  ('username' -> (simulation at: 'username')).
-		  ('model' -> (simulation at: 'model')).
-		  ('progress' -> (simulation at: 'progress')).
-		  ('state' -> 'running').		
-	} asDictionary
-]
-
 { #category : #path }
-RMSServer >> getSimulations: request [ 
-	
-		|simulationsValuesWithoutToken|
-	
-	simulationsValuesWithoutToken := Dictionary new. 
-	simulations simulations valuesDo:[:value|  simulationsValuesWithoutToken at:(value at:'id') put:(self createSimulationWithoutToken: value) ].
-	^ simulationsValuesWithoutToken values. 
-	"^ simulations getSimulationsValues."
-]
-
-{ #category : #path }
-RMSServer >> getSpecificSimulationById: request [
-	^ self
-		createSimulationWithoutToken: (simulations getSimulationById: (request at: #id))
+RMSServer >> getRun: request [
+	^ repository at: (request at: #id)
 ]
 
 { #category : #initialization }
 RMSServer >> initializePort: port [
-	simulations := RMSSimulationRepository new.
+	repository := RMSRunRepository new.
 	teapot ifNotNil: #stop.
 	teapot := Teapot
 		configure:
@@ -166,6 +129,12 @@ RMSServer >> initializePort: port [
 		yourself
 ]
 
+{ #category : #path }
+RMSServer >> listAllRuns: request [
+	^ Array
+		streamContents: [ :stream | repository do: [ :dict | stream nextPut: dict ] ]
+]
+
 { #category : #'error handler' }
 RMSServer >> missingParam: aKeyNotFoundError request: aZnRequest [
 
@@ -175,25 +144,11 @@ RMSServer >> missingParam: aKeyNotFoundError request: aZnRequest [
 			  asDictionary
 ]
 
-{ #category : #private }
-RMSServer >> readRequestParameters: request [
-	^ NeoJSONReader fromString: request entity contents
-]
-
-{ #category : #path }
-RMSServer >> refreshSimulationState: request [
-
-	^ simulations
-		  replaceSimulation: (request at: 'id')
-		  with: (self createSimulationForRefresh: request)
-
-]
-
 { #category : #initialization }
 RMSServer >> registerErrorHandlers [
 
 	teapot 
-	exception: RMSSimulationNotFound   -> (Send message:#simulationNotFound:request: to:self);
+	exception: RMSRunNotFound   -> (Send message:#simulationNotFound:request: to:self);
 	exception: KeyNotFound -> (Send message:#missingParam:request: to:self);
 	exception: RMSTokenNotMatching ->(Send message:#tokenNotMatching:request: to:self);
 	exception: Error ->(TeaResponse serverError body:{#code ->'ERROR'} asDictionary)
@@ -214,32 +169,44 @@ RMSServer >> registerRoutes [
 		GET: '/' -> '<h1> reMobidycServer API V0.0.1</h1>';
 		output: #html;
 		OPTIONS: '/api/register' -> '';
-		POST: '/api/register' -> (Send message: #registerSimulation: to: self);
-		GET: '/api/runs/' -> (Send message: #getSimulations: to: self);
+		POST: '/api/register' -> (Send message: #registerRun: to: self);
+		GET: '/api/runs/' -> (Send message: #listAllRuns: to: self);
 		GET: '/api/runs/<id:IsInteger>'
-			-> (Send message: #getSpecificSimulationById: to: self);
+			-> (Send message: #getRun: to: self);
 		PUT: '/api/runs/<id:IsInteger>'
-			-> (Send message: #refreshSimulationState: to: self);
+			-> (Send message: #updateRun: to: self);
 		DELETE: '/api/runs/<id:IsInteger>'
-			-> (Send message: #removeSimulation: to: self)
+			-> (Send message: #removeRun: to: self)
 ]
 
 { #category : #path }
-RMSServer >> registerSimulation: request [
-
-	| simulation |
-	simulation := simulations addSimulation: (self createSimulation: request).
-	
+RMSServer >> registerRun: request [
+	| simulation runId token |
+	simulation := repository add: (self requestParams: request).
+	runId := simulation at: 'id'.
+	token := repository tokenAt: runId.
 	^ TeaResponse created
-		  body: simulation;
-		  location: '/runs/' , (simulation at: #id) asString
+		body:
+			{('id' -> runId).
+			('token' -> token)} asDictionary;
+		location: '/runs/' , (simulation at: #id) asString
 ]
 
 { #category : #path }
-RMSServer >> removeSimulation: request [
-	^ simulations
-		removeSimulation: (request at: 'id')
-		token: ((self readRequestParameters: request) at: 'token' ifAbsent: [ nil ])
+RMSServer >> removeRun: request [
+	^ repository
+		remove: (request at: 'id')
+		token: ((self requestParams: request) at: 'token' ifAbsent: [ nil ])
+]
+
+{ #category : #accessing }
+RMSServer >> repository [
+	^ repository
+]
+
+{ #category : #accessing }
+RMSServer >> requestParams: request [
+	^ NeoJSONReader fromString: request entity contents
 ]
 
 { #category : #'error handler' }
@@ -252,11 +219,6 @@ RMSServer >> simulationNotFound: aSimulation request: aZnRequest [
 ]
 
 { #category : #accessing }
-RMSServer >> simulations [
-	^ simulations.
-]
-
-{ #category : #accessing }
 RMSServer >> start [
 	teapot ifNotNil: #start
 ]
@@ -266,6 +228,11 @@ RMSServer >> stop [
 	teapot ifNotNil: #stop
 ]
 
+{ #category : #accessing }
+RMSServer >> teapot [
+	^ teapot
+]
+
 { #category : #'error handler' }
 RMSServer >> tokenNotMatching: aTokenNotMatching request: aZnRequest [ 
 	
@@ -273,4 +240,14 @@ RMSServer >> tokenNotMatching: aTokenNotMatching request: aZnRequest [
 			  #code -> 'OPERATION_DENIED'.
 			  #message -> ('Token does not match : ' , aTokenNotMatching token) }
 			  asDictionary
+]
+
+{ #category : #path }
+RMSServer >> updateRun: request [
+	| params |
+	params := self requestParams: request.
+	^ repository
+		at: (request at: 'id')
+		put: params
+		token: (params at: 'token')
 ]
